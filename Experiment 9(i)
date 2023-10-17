@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_HISTORY_SIZE 10
+
+// Define the structure for a URL node
+struct Node {
+    char url[100];
+    struct Node* next;
+};
+
+// Global variables for the stack and its size
+struct Node* stackTop = NULL;
+int stackSize = 0;
+
+// Function to push a URL onto the stack
+void push(const char* url) {
+    if (stackSize >= MAX_HISTORY_SIZE) {
+        printf("History is full. Cannot add more URLs.\n");
+        return;
+    }
+
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    strncpy(newNode->url, url, sizeof(newNode->url));
+    newNode->next = stackTop;
+    stackTop = newNode;
+    stackSize++;
+}
+
+// Function to pop a URL from the stack
+void pop() {
+    if (stackTop == NULL) {
+        printf("No URLs in history.\n");
+        return;
+    }
+
+    struct Node* temp = stackTop;
+    stackTop = stackTop->next;
+    free(temp);
+    stackSize--;
+}
+
+// Function to display the browsing history
+void displayHistory() {
+    printf("Browsing History:\n");
+    struct Node* current = stackTop;
+    while (current != NULL) {
+        printf("%s\n", current->url);
+        current = current->next;
+    }
+}
+
+int main() {
+    int choice;
+    char url[100];
+
+    while (1) {
+        printf("\nBrowser History Menu:\n");
+        printf("1. Visit a URL\n");
+        printf("2. Back\n");
+        printf("3. Display History\n");
+        printf("4. Quit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter URL to visit: ");
+                scanf("%s", url);
+                push(url);
+                break;
+            case 2:
+                pop();
+                break;
+            case 3:
+                displayHistory();
+                break;
+            case 4:
+                printf("Exiting...\n");
+                exit(EXIT_SUCCESS);
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+
+    return 0;
+}
