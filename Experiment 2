@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+// Define a structure named 'Person'
+struct Person {
+    char name[50];
+    int age;
+    float height;
+};
+
+int main() {
+    // Declare a pointer to a structure of type 'Person'
+    struct Person *personPtr;
+
+    // Allocate memory for a 'Person' structure using dynamic memory allocation (malloc)
+    personPtr = (struct Person *)malloc(sizeof(struct Person));
+
+    if (personPtr == NULL) {
+        printf("Memory allocation failed. Exiting...\n");
+        return 1;
+    }
+
+    // Access and assign values using pointers
+    strcpy(personPtr->name, "John Doe");
+    personPtr->age = 30;
+    personPtr->height = 5.9;
+
+    // Access and print values using pointers
+    printf("Name: %s\n", personPtr->name);
+    printf("Age: %d\n", personPtr->age);
+    printf("Height: %.2f feet\n", personPtr->height);
+
+    // Free the allocated memory
+    free(personPtr);
+
+    return 0;
+}
