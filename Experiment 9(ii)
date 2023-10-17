@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+#define MAX_QUEUE_SIZE 10
+
+// Define the structure for a print job
+struct PrintJob {
+    char documentName[50];
+    struct PrintJob* next;
+};
+
+// Define the queue structure
+struct Queue {
+    struct PrintJob* front;
+    struct PrintJob* rear;
+    int size;
+};
+
+// Function to create an empty queue
+struct Queue* createQueue() {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    if (queue == NULL) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+    queue->front = NULL;
+    queue->rear = NULL;
+    queue->size = 0;
+    return queue;
+}
+
+// Function to check if the queue is empty
+bool isEmpty(struct Queue* queue) {
+    return queue->size == 0;
+}
+
+// Function to enqueue (add) a print job to the queue
+void enqueue(struct Queue* queue, const char* documentName) {
+    if (queue->size >= MAX_QUEUE_SIZE) {
+        printf("Print queue is full. Cannot add more print jobs.\n");
+        return;
+    }
+
+    struct PrintJob* newJob = (struct PrintJob*)malloc(sizeof(struct PrintJob));
+    if (newJob == NULL) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    strncpy(newJob->documentName, documentName, sizeof(newJob->documentName));
+    newJob->next = NULL;
+
+    if (isEmpty(queue)) {
+        queue->front = newJob;
+        queue->rear = newJob;
+    } else {
+        queue->rear->next = newJob;
+        queue->rear = newJob;
+    }
+
+    queue->size++;
+}
+
+// Function to dequeue (remove) a print job from the queue
+void dequeue(struct Queue* queue) {
+    if (isEmpty(queue)) {
+        printf("Print queue is empty. Nothing to dequeue.\n");
+        return;
+    }
+
+    struct PrintJob* temp = queue->front;
+    queue->front = queue->front->next;
+    free(temp);
+    queue->size--;
+}
+
+// Function to display the print queue
+void displayQueue(struct Queue* queue) {
+    printf("Print Queue:\n");
+    struct PrintJob* current = queue->front;
+    while (current != NULL) {
+        printf("- %s\n", current->documentName);
+        current = current->next;
+    }
+}
+
+int main() {
+    struct Queue* printQueue = createQueue();
+    int choice;
+    char documentName[50];
+
+    while (1) {
+        printf("\nPrint Queue Menu:\n");
+        printf("1. Enqueue (Add a Print Job)\n");
+        printf("2. Dequeue (Print Next Job)\n");
+        printf("3. Display Print Queue\n");
+        printf("4. Quit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter document name to print: ");
+                scanf("%s", documentName);
+                enqueue(printQueue, documentName);
+                break;
+            case 2:
+                dequeue(printQueue);
+                break;
+            case 3:
+                displayQueue(printQueue);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                exit(EXIT_SUCCESS);
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+
+    return 0;
+}
